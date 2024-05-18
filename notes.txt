@@ -1,0 +1,139 @@
+import React, { useEffect } from 'react'
+import Modal from 'react-bootstrap/Modal';
+import { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import { Row,Col } from 'react-bootstrap';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import Form from 'react-bootstrap/Form';
+import base_url from '../services/server_url';
+
+function Edit({project}) {
+
+
+  const [projectData,setProjectData]=useState({
+    id:project._id,title:project.title,overview:project.overview,language:project.language,github:project.github,demo:project.demo,projectImage:""
+  })
+  const [imageStatus,setImageStatus]=useState(false)
+  const [preview,setPreview]=useState("")
+
+  useEffect(()=>{
+    if(projectData.projectImage.type=="image/jpg" || projectData.projectImage.type=="image/jpeg " || projectData.projectImage.type=="image/png"){
+      setImageStatus(false)
+      setPreview(URL.createObjectURL(projectData.projectImage))
+    }
+    else{
+      setImageStatus(true)
+      setPreview("")
+    }
+  },[projectData.projectImage])
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+const handleUpdate=async()=>{
+  console.log(projectData)
+}
+
+
+  return (
+   <>
+   
+   <button className='btn mt-3' onClick={handleShow}>
+            <i className="fa-solid fa-pen-to-square fa-2xl" />
+            </button>
+   <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title> Add projects</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+       <div>
+        <Row>
+            <Col>
+             <label>
+                <input type="file" name='' id='in' style={{display:'none'}}  onChange={(e)=>{setProjectData({...projectData,projectImage:e.target.files[0]})}}/>
+                  <img src={preview?preview:`${base_url}/uploads/${project.image}`} alt="" className='img-fluid'  width={'150px'}/>
+            </label>
+            {
+              imageStatus &&
+              <p className='text-danger'> image extension invalid</p>
+            }
+          
+            </Col>
+            <Col>
+            <div>
+            <FloatingLabel controlId="titleinp" label="titlle"className="mb-3">
+        <Form.Control type="text" placeholder="title" value={project.title} onChange={(e)=>{setProjectData({...projectData,title:e.target.value})}} />
+      </FloatingLabel>
+      <FloatingLabel controlId="overvierinp" label="overview" className="mb-3">
+        <Form.Control type="text" placeholder="overview"   value={project.overview} onChange={(e)=>{setProjectData({...projectData,overview:e.target.value})}} />
+      </FloatingLabel>
+      <FloatingLabel controlId="languageinp" label="language" className="mb-3">
+        <Form.Control type="text" placeholder="language"   value={project.language} onChange={(e)=>{setProjectData({...projectData,language:e.target.value})}} />
+      </FloatingLabel>
+      <FloatingLabel controlId="githubinp" label="github Url" className="mb-3">
+        <Form.Control type="text" placeholder="githuburl"  value={project.github} onChange={(e)=>{setProjectData({...projectData,github:e.target.value})}} />
+      </FloatingLabel>
+            </div>
+            </Col>
+            <FloatingLabel controlId="demoinp" label="demo Url"  className='p-1'>
+             <Form.Control type="text" placeholder="demo Url"  value={project.demo} onChange={(e)=>{setProjectData({...projectData,demo:e.target.value})}} />
+             </FloatingLabel>
+        </Row>
+       </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdate}>update</Button>
+        </Modal.Footer>
+        
+
+      </Modal>
+   </>
+  )
+}
+
+export default Edit <img src={preview?preview:`${base_url}/uploads/${project.image}`} alt="" className='img-fluid'  width={'150px'} />
+
+
+
+
+
+
+
+import React, { Children, useEffect, useState } from 'react'
+import { createContext } from 'react'
+
+
+
+export const TokenAuthContext=createContext()
+
+function AuthContext({Children}) {
+    const [authStatus,setAuthStatus]=useState(false)
+
+    useEffect(()=>{
+        if(sessionStorage.getItem('token')){
+            setAuthStatus(true)
+        }
+        else{
+            setAuthStatus(false)
+        }
+    },[])
+  return (
+    <>
+    <TokenAuthContext.Provider value={{authStatus,setAuthStatus}}>
+        {Children}
+    </TokenAuthContext.Provider>
+    
+    </>
+  )
+}
+
+export default AuthContext
